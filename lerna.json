@@ -3,8 +3,9 @@
     "apps/docs",
     "packages/core",
     "packages/create-puck-app",
+    "packages/field-contentful",
     "packages/plugin-heading-analyzer"
   ],
-  "version": "0.13.1",
+  "version": "0.14.1",
   "npmClient": "yarn"
 }

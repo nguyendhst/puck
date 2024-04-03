@@ -1,6 +1,6 @@
 {
   "name": "@measured/puck",
-  "version": "0.13.1",
+  "version": "0.14.1",
   "author": "Measured Corporation Ltd <hello@measured.co>",
   "repository": "measuredco/puck",
   "bugs": "https://github.com/measuredco/puck/issues",
@@ -46,6 +46,7 @@
     "@types/jest": "^29.5.4",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
+    "css-box-model": "^1.2.1",
     "eslint": "^7.32.0",
     "eslint-config-custom": "*",
     "jest": "^29.6.4",
@@ -58,7 +59,8 @@
     "typescript": "^4.5.2"
   },
   "dependencies": {
-    "@hello-pangea/dnd": "^16.3.0",
+    "@measured/auto-frame-component": "0.1.1",
+    "@measured/dnd": "16.6.0-canary.c7c88e8",
     "deep-diff": "^1.0.2",
     "react-hotkeys-hook": "^4.4.1",
     "react-spinners": "^0.13.8",

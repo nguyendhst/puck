@@ -1,6 +1,6 @@
 import styles from "./styles.module.css";
 import getClassNameFactory from "../../lib/get-class-name-factory";
-import { Data } from "../../types/Config";
+import { Config, Data } from "../../types/Config";
 import { ItemSelector, getItem } from "../../lib/get-item";
 import { scrollIntoView } from "../../lib/scroll-into-view";
 import { ChevronDown, LayoutGrid, Layers, Type } from "lucide-react";
@@ -10,12 +10,14 @@ import { dropZoneContext } from "../DropZone/context";
 import { findZonesForArea } from "../../lib/find-zones-for-area";
 import { getZoneId } from "../../lib/get-zone-id";
 import { isChildOfZone } from "../../lib/is-child-of-zone";
+import { getFrame } from "../../lib/get-frame";
 
 const getClassName = getClassNameFactory("LayerTree", styles);
 const getClassNameLayer = getClassNameFactory("Layer", styles);
 
 export const LayerTree = ({
   data,
+  config,
   zoneContent,
   itemSelector,
   setItemSelector,
@@ -23,6 +25,7 @@ export const LayerTree = ({
   label,
 }: {
   data: Data;
+  config: Config;
   zoneContent: Data["content"];
   itemSelector?: ItemSelector | null;
   setItemSelector: (item: ItemSelector | null) => void;
@@ -30,7 +33,6 @@ export const LayerTree = ({
   label?: string;
 }) => {
   const zones = data.zones || {};
-
   const ctx = useContext(dropZoneContext);
 
   return (
@@ -95,8 +97,10 @@ export const LayerTree = ({
 
                     const id = zoneContent[i].props.id;
 
+                    const frame = getFrame();
+
                     scrollIntoView(
-                      document.querySelector(
+                      frame?.querySelector(
                         `[data-rfd-drag-handle-draggable-id="draggable-${id}"]`
                       ) as HTMLElement
                     );
@@ -128,7 +132,9 @@ export const LayerTree = ({
                         <LayoutGrid size="16" />
                       )}
                     </div>
-                    <div className={getClassNameLayer("name")}>{item.type}</div>
+                    <div className={getClassNameLayer("name")}>
+                      {config.components[item.type]["label"] ?? item.type}
+                    </div>
                   </div>
                 </button>
               </div>
@@ -136,6 +142,7 @@ export const LayerTree = ({
                 Object.keys(zonesForItem).map((zoneKey, idx) => (
                   <div key={idx} className={getClassNameLayer("zones")}>
                     <LayerTree
+                      config={config}
                       data={data}
                       zoneContent={zones[zoneKey]}
                       setItemSelector={setItemSelector}

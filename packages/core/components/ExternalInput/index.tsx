@@ -67,7 +67,7 @@ export const ExternalInput = ({
     async (query, filters) => {
       setIsLoading(true);
 
-      const cacheKey = `${id}-${name}-${query}-${JSON.stringify(filters)}`;
+      const cacheKey = `${id}-${query}-${JSON.stringify(filters)}`;
 
       const listData =
         dataCache[cacheKey] || (await field.fetchList({ query, filters }));
@@ -96,6 +96,7 @@ export const ExternalInput = ({
     >
       <div className={getClassName("actions")}>
         <button
+          type="button"
           onClick={() => setOpen(true)}
           className={getClassName("button")}
         >

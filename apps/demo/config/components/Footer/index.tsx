@@ -2,9 +2,11 @@ import { ReactNode } from "react";
 import { Section } from "../Section";
 
 const FooterLink = ({ children, href }: { children: string; href: string }) => {
+  const El = href ? "a" : "span";
+
   return (
     <li style={{ paddingBottom: 8 }}>
-      <a
+      <El
         href={href}
         style={{
           textDecoration: "none",
@@ -13,7 +15,7 @@ const FooterLink = ({ children, href }: { children: string; href: string }) => {
         }}
       >
         {children}
-      </a>
+      </El>
     </li>
   );
 };
@@ -55,7 +57,7 @@ const FooterList = ({
 const Footer = ({ children }: { children: ReactNode }) => {
   return (
     <footer style={{ background: "var(--puck-color-grey-12)" }}>
-      <h2 style={{ visibility: "hidden", height: 0 }}>Footer</h2>
+      <h2 style={{ visibility: "hidden", height: 0, margin: 0 }}>Footer</h2>
       <Section padding="32px">
         <div
           style={{

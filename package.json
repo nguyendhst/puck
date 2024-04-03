@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
-    "dev": "turbo run dev",
+    "dev": "turbo run dev --scope demo",
     "lint": "turbo run lint",
     "format:check": "prettier --check \"**/*.{ts,tsx,md,mdx}\"",
     "format": "prettier --write \"**/*.{ts,tsx,md,mdx}\"",
@@ -32,7 +32,7 @@
     "recipes/*",
     "packages/*"
   ],
-  "version": "0.13.1",
+  "version": "0.14.1",
   "engines": {
     "node": ">=18"
   }

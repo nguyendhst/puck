@@ -1,15 +1,15 @@
 .DraggableComponent {
-  outline-offset: 0px !important;
   pointer-events: auto;
-}
 
-.DraggableComponent:focus-visible {
-  outline: 2px solid var(--puck-color-azure-05);
+  --overlay-background: color-mix(
+    in srgb,
+    var(--puck-color-azure-08) 30%,
+    transparent
+  );
 }
 
 .DraggableComponent--isDragging {
   background: color-mix(in srgb, var(--puck-color-azure-08) 10%, transparent);
-  outline: 2px var(--puck-color-azure-09) solid !important;
   overflow: hidden;
 }
 
@@ -27,16 +27,23 @@
 }
 
 .DraggableComponent-overlay {
-  display: none;
-  background: color-mix(in srgb, var(--puck-color-azure-08) 30%, transparent);
   cursor: pointer;
   height: 100%;
   width: 100%;
   top: 0;
+  outline-offset: -2px;
   position: absolute;
-  z-index: 0;
   pointer-events: none;
   box-sizing: border-box;
+  z-index: 1;
+}
+
+.DraggableComponent:focus-visible > .DraggableComponent-overlay {
+  outline: 1px solid var(--puck-color-azure-05);
+}
+
+.DraggableComponent--isDragging > .DraggableComponent-overlay {
+  outline: 1px var(--puck-color-azure-09) solid !important;
 }
 
 .DraggableComponent-loadingOverlay {
@@ -57,23 +64,21 @@
 
 .DraggableComponent:hover:not(.DraggableComponent--isLocked)
   > .DraggableComponent-overlay {
-  display: block;
+  background: var(--overlay-background);
   pointer-events: none;
 }
 
 .DraggableComponent--forceHover > .DraggableComponent-overlay {
-  display: block;
+  background: var(--overlay-background);
   pointer-events: none;
 }
 
-.DraggableComponent:not(.DraggableComponent--isSelected)
+.DraggableComponent:not(.DraggableComponent--isSelected):hover
   > .DraggableComponent-overlay {
   outline: 2px var(--puck-color-azure-09) solid !important;
 }
 
 .DraggableComponent--indicativeHover > .DraggableComponent-overlay {
-  display: block;
-  background: transparent; /* We only use backgrounds on natural hovers */
   pointer-events: none;
 }
 
@@ -85,23 +90,19 @@
   display: none;
 }
 
-.DraggableComponent--isSelected {
+.DraggableComponent--isSelected > .DraggableComponent-overlay {
   outline: 2px var(--puck-color-azure-07) solid !important;
 }
 
-.DraggableComponent--isSelected > .DraggableComponent-overlay {
-  background: none;
+.DraggableComponent--isSelected > .DraggableComponent-actionsOverlay {
   display: block;
   position: sticky;
-  top: 56px;
-  z-index: 1;
+  z-index: 2;
 }
 
 .DraggableComponent-actions {
   position: absolute;
-  right: 6.5px;
   width: auto;
-  top: -48px;
   padding: 4px;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
@@ -114,10 +115,11 @@
   gap: 4px;
   pointer-events: auto;
   box-sizing: border-box;
+  transform-origin: right top;
 }
 
 .DraggableComponent--isSelected
-  > .DraggableComponent-overlay
+  > .DraggableComponent-actionsOverlay
   > .DraggableComponent-actions {
   display: flex;
 }
@@ -132,7 +134,7 @@
   padding-left: 8px;
   padding-right: 16px;
   margin-right: 8px;
-  border-right: 1px solid var(--puck-color-grey-05);
+  border-right: 0.5px solid var(--puck-color-grey-05); /* Fractional value required due to scaling */
   text-overflow: ellipsis;
   white-space: nowrap;
 }

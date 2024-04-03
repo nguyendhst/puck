@@ -1,7 +1,8 @@
 import { ReactElement } from "react";
 import { ReactNode } from "react";
 import { ItemSelector } from "../lib/get-item";
-import { DropZone } from "../components/DropZone";
+import { DropZoneProps } from "../components/DropZone/types";
+import { Viewport } from "./Viewports";
 
 type WithPuckProps<Props> = Props & {
   id: string;
@@ -50,6 +51,8 @@ export type ArrayField<
   };
   defaultItemProps?: Props[0];
   getItemSummary?: (item: Props[0], index?: number) => string;
+  max?: number;
+  min?: number;
 };
 
 export type ObjectField<
@@ -57,7 +60,7 @@ export type ObjectField<
 > = BaseField & {
   type: "object";
   objectFields: {
-    [SubPropName in keyof Props[0]]: Field<Props[0][SubPropName]>;
+    [SubPropName in keyof Props]: Field<Props[SubPropName]>;
   };
 };
 
@@ -94,7 +97,7 @@ export type ExternalField<
   }) => Promise<any[] | null>;
   mapProp?: (value: any) => Props;
   mapRow?: (value: any) => Record<string, string | number>;
-  getItemSummary: (item: Props, index?: number) => string;
+  getItemSummary?: (item: Props, index?: number) => string;
   showSearch?: boolean;
   initialQuery?: string;
   filterFields?: Record<string, Field>;
@@ -148,28 +151,35 @@ export type Content<
   Props extends { [key: string]: any } = { [key: string]: any }
 > = ComponentData<Props>[];
 
-export type PuckComponent<
-  Props extends DefaultComponentProps = DefaultComponentProps
-> = (props: WithPuckProps<Props & { puck: PuckContext }>) => JSX.Element;
+export type PuckComponent<Props> = (
+  props: WithPuckProps<Props & { puck: PuckContext }>
+) => JSX.Element;
 
 export type PuckContext = {
-  renderDropZone: typeof DropZone;
+  renderDropZone: React.FC<DropZoneProps>;
 };
 
 export type ComponentConfig<
   ComponentProps extends DefaultComponentProps = DefaultComponentProps,
   DefaultProps = ComponentProps,
-  DataShape = ComponentData<ComponentProps>
+  DataShape = Omit<ComponentData<ComponentProps>, "type">
 > = {
   render: PuckComponent<ComponentProps>;
+  label?: string;
   defaultProps?: DefaultProps;
   fields?: Fields<ComponentProps>;
   resolveData?: (
     data: DataShape,
     params: { changed: Partial<Record<keyof ComponentProps, boolean>> }
   ) =>
-    | Promise<Partial<ComponentDataWithOptionalProps<ComponentProps>>>
-    | Partial<ComponentDataWithOptionalProps<ComponentProps>>;
+    | Promise<{
+        props?: Partial<ComponentProps>;
+        readOnly?: Partial<Record<keyof ComponentProps, boolean>>;
+      }>
+    | {
+        props?: Partial<ComponentProps>;
+        readOnly?: Partial<Record<keyof ComponentProps, boolean>>;
+      };
 };
 
 type Category<ComponentName> = {
@@ -180,12 +190,12 @@ type Category<ComponentName> = {
 };
 
 export type Config<
-  Props extends { [key: string]: any } = { [key: string]: any },
+  Props extends Record<string, any> = Record<string, any>,
   RootProps extends DefaultRootProps = DefaultRootProps,
-  CategoryName extends string = any
+  CategoryName extends string = string
 > = {
   categories?: Record<CategoryName, Category<keyof Props>> & {
-    other?: Category<Props>;
+    other?: Category<keyof Props>;
   };
   components: {
     [ComponentName in keyof Props]: Omit<
@@ -195,9 +205,9 @@ export type Config<
   };
   root?: Partial<
     ComponentConfig<
-      RootProps & { children: ReactNode },
-      Partial<RootProps & { children: ReactNode }>,
-      RootDataWithProps<RootProps>
+      RootProps & { children?: ReactNode },
+      Partial<RootProps & { children?: ReactNode }>,
+      RootDataWithProps
     >
   >;
 };
@@ -271,6 +281,14 @@ export type UiState = {
     }
   >;
   isDragging: boolean;
+  viewports: {
+    current: {
+      width: number;
+      height: number | "auto";
+    };
+    controlsVisible: boolean;
+    options: Viewport[];
+  };
 };
 
 export type AppState = { data: Data; ui: UiState };

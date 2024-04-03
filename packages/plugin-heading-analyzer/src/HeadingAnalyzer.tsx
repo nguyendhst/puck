@@ -1,11 +1,12 @@
 import { ReactElement, useEffect, useState } from "react";
 
-import { usePuck } from "@/core";
+import { usePuck } from "@measured/puck";
 import { Plugin } from "@/core/types/Plugin";
 import { SidebarSection } from "@/core/components/SidebarSection";
 import { OutlineList } from "@/core/components/OutlineList";
 
 import { scrollIntoView } from "@/core/lib/scroll-into-view";
+import { getFrame } from "@/core/lib/get-frame";
 
 import ReactFromJSON from "react-from-json";
 
@@ -13,10 +14,9 @@ const dataAttr = "data-puck-heading-analyzer-id";
 
 const getOutline = ({
   addDataAttr = false,
-}: { addDataAttr?: boolean } = {}) => {
-  const headings = window.document
-    .querySelector("#puck-preview")!
-    .querySelectorAll("h1,h2,h3,h4,h5,h6");
+  frame,
+}: { addDataAttr?: boolean; frame?: Element | Document } = {}) => {
+  const headings = frame?.querySelectorAll("h1,h2,h3,h4,h5,h6") || [];
 
   const _outline: { rank: number; text: string; analyzeId: string }[] = [];
 
@@ -43,8 +43,8 @@ type Block = {
   analyzeId?: string;
 };
 
-function buildHierarchy(): Block[] {
-  const headings = getOutline({ addDataAttr: true });
+function buildHierarchy(frame: Element | Document): Block[] {
+  const headings = getOutline({ addDataAttr: true, frame });
 
   const root = { rank: 0, children: [], text: "" }; // Placeholder root node
   let path: Block[] = [root];
@@ -94,17 +94,20 @@ export const HeadingAnalyzer = () => {
 
   // Re-render when content changes
   useEffect(() => {
-    // We need to delay to allow remainder of page to render first
+    const frame = getFrame();
 
+    if (!frame) return;
+
+    // We need to delay to allow remainder of page to render first
     if (firstRender) {
       setTimeout(() => {
-        setHierarchy(buildHierarchy());
+        setHierarchy(buildHierarchy(frame));
         setFirstRender(false);
       }, 100);
     } else {
-      setHierarchy(buildHierarchy());
+      setHierarchy(buildHierarchy(frame));
     }
-  }, [appState.data.content]);
+  }, [appState.data]);
 
   return (
     <>
@@ -127,7 +130,9 @@ export const HeadingAnalyzer = () => {
                         : (e) => {
                             e.stopPropagation();
 
-                            const el = document.querySelector(
+                            const frame = getFrame();
+
+                            const el = frame?.querySelector(
                               `[${dataAttr}="${props.analyzeId}"]`
                             ) as HTMLElement;
 
